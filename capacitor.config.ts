@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
+  appId: 'uk.co.codeswag.camera',
   appName: 'codeswagCamera',
   webDir: 'www'
 };
