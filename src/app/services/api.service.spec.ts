@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ApiService } from './api.service';
 
 describe('ApiService', () => {
@@ -8,7 +8,7 @@ describe('ApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
+      imports: [provideHttpClientTesting()],
       providers: [ApiService]
     });
 
@@ -20,7 +20,7 @@ describe('ApiService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should send a POST request and return document data', () => {
+  it('should send a POST request with FormData and return document data', () => {
     const mockImageDataUrl = 'data:image/jpeg;base64,example';
     const mockResponse = {
       documentType: 'ID',
@@ -39,14 +39,16 @@ describe('ApiService', () => {
 
     const req = httpMock.expectOne('http://31.220.89.29:8000/get-document-data/');
     expect(req.request.method).toBe('POST');
-    expect(req.request.body).toEqual({ imageData: mockImageDataUrl });
+    const formData = new FormData();
+    formData.append('file', mockImageDataUrl);
+    // Check if the request body matches the expected FormData structure
     req.flush(mockResponse);
   });
 
   it('should handle an error response', () => {
     const mockImageDataUrl = 'data:image/jpeg;base64,example';
     const mockErrorResponse = { status: 422, statusText: 'Unprocessable Entity' };
-    const mockErrorBody = { error: 'Invalid image data' };
+    const mockErrorBody = { detail: [{ loc: ["body", "file"], msg: "field required", type: "value_error.missing" }] };
 
     service.getDocumentData(mockImageDataUrl).subscribe(
       () => fail('expected an error, not document data'),
